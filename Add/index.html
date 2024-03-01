@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body{
+            /* background-color: rgb(207, 248, 234); */
+            height: 100vh;
+            font-family: cursive;
+            /* background-image: linear-gradient(to bottom right ,#BFFFC7,#18A5A7); */
+        }
+
+        video{
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+     z-index:-1;
+     }
+
+        #out{
+            height: 90vh;
+            position: relative;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        #f{
+            line-height: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items:center;
+            padding-top: 20px;
+            height: 300px;
+            width: 300px;
+            /* background-image: linear-gradient(to bottom right ,#18A5A7,#BFFFC7); */
+            background-color: rgba(255, 255, 255, 0.401);
+            border: 2px solid rgb(255,255,255);
+            border-radius: 30px;
+            box-shadow: 0px 0px 166px -21px rgba(255, 255, 255, 0.522)        
+        }
+        input{
+            padding: 8px;
+            box-sizing: border-box;
+            border-radius: 30px;
+            width: 80%;
+        }
+        button{
+            /* background-color: rgb(208, 252, 141); */
+            background-color: rgba(255, 255, 255, 0.696);
+            height: 40px;
+            width: 80px;
+            margin-top: 20px;
+            /* margin-left: 10px; */
+            border-radius: 20px;
+            cursor:pointer;
+            border: 2px solid white;
+            font-family: cursive;
+        }
+        button:hover {
+            border: 1.5px solid white; 
+            /* background: linear-gradient(to bottom right, rgb(208, 252, 141), rgb(220, 255, 167),rgb(208, 252, 141)); */
+            background-color: rgb(255,255,255);
+            transform: scale(1.2);
+            transition: 0.3s ease-in-out;
+        }
+    </style>
+    <link rel="Icon" type="image/png" href="image.png">
+    <title>Addition</title>
+</head>
+<body>
+    <video autoplay muted loop>
+        <source src="rain_-_17902 (540p).mp4">
+    </video>
+    <div id="out">
+        <div id="f">
+            <h2><i>Addition</i></h2>
+            <input type="text" id="val1" placeholder="Enter x"> <br>
+            <input type="text" id="val2" placeholder="Enter y"> <br>
+            <button id="add">Add!</button> <br>
+            <p id="result">Result</p>
+        
+        </div>
+    </div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.5/web3.min.js" integrity="sha512-/T7YwzOsNeoNkuTfYKXn3CrJCGc5cnC8T4QW46Hy+3Xjdjrxzokmbx8M8Xavjq1K7dN4958kIRGy4J03VRIlSg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+    $(document).ready(function() {
+        var web3;
+
+        if (typeof window.ethereum !== 'undefined') {
+            web3 = new Web3(window.ethereum);
+            window.ethereum.enable();
+        } else if (typeof window.web3 !== 'undefined') {
+            web3 = new Web3(window.web3.currentProvider);
+        } else {
+            web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:5500'));
+        }
+
+        // Set contract ABI
+        var contractAbi = 
+        [
+	{
+		"inputs": [],
+		"name": "add",
+		"outputs": [
+			{
+				"internalType": "int256",
+				"name": "",
+				"type": "int256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "int256",
+				"name": "x",
+				"type": "int256"
+			},
+			{
+				"internalType": "int256",
+				"name": "y",
+				"type": "int256"
+			}
+		],
+		"name": "input",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+];
+        // Set contract address
+        var contractAddress = '0x4D9EEC0536441D3A355fB6600433E0EBca2de8eb';
+        // Set the contract
+        var contract = new web3.eth.Contract(contractAbi, contractAddress);
+
+        $('#add').click(async () => {
+            const val1 = parseInt($('#val1').val());
+            const val2 = parseInt($('#val2').val());
+            try {
+                const accounts = await web3.eth.getAccounts();
+                const fromAccount = accounts[0];
+        
+                await contract.methods.input(val1, val2).send({ from: fromAccount });
+                const result = await contract.methods.add().call();
+                $('#result').html('Result: ' + result);
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        });
+    });
+</script>
+</html>
